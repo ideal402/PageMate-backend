@@ -15,7 +15,6 @@ authController.login = async (req,res) => {
         }
 
         const isMatch = await bcrypt.compare(password, user.password);
-        console.log("🚀 ~ authController.login= ~ isMatch:", isMatch)
 
         if(!isMatch){
             throw new Error("이메일 혹은 비밀번호를 확인해주세요");
