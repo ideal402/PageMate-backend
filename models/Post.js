@@ -22,4 +22,12 @@ const postSchema = Schema(
   { timestamps: true }
 );
 
+postSchema.methods.toJSON = function () {
+  const obj = this._doc;
+  delete obj.__v;
+
+  return obj;
+};
+
+
 module.exports = mongoose.model("Post", postSchema);
