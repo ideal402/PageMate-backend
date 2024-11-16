@@ -9,7 +9,7 @@ const commentSchema = new Schema(
   },
   { timestamps: true }
 );
-
+asdf
 const postSchema = Schema(
   {
     userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
