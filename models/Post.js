@@ -20,6 +20,7 @@ const postSchema = Schema(
     comments: { type: [commentSchema], default: [] },
     bookTitle: { type: String, required: true },
     bookAuthor: { type: String, required: true },
+    isDeleted: { type: Boolean, default: "false" }
   },
   { timestamps: true }
 );
