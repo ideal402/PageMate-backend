@@ -14,11 +14,11 @@ app.use("/api", indexRouter);
 const mongoURI = process.env.DB_ADDRESS;
 
 mongoose
-  .connect(mongoURI, { useNewUrlParser: true })
+  .connect(mongoURI)
   .then(() => console.log("mongoose connected"))
   .catch((error) => console.log("DB connected fail:", error));
 
-const server = app.listen(process.env.PORT || 5000, () => {
+const server = app.listen(process.env.PORT || 5001, () => {
   console.log(`server is on ${process.env.PORT}`);
 });
 
