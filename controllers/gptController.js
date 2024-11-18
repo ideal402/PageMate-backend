@@ -20,7 +20,6 @@ function generateFewShotPrompt(samplesData, review) {
 
     prompt += "### 다음 학습한 스타일을 토대로 리뷰를 바꿔주세요, 다만 추가적인 문장을 생성하진 마시오.\n";
     prompt += review;
-    console.log("prompt:\n", prompt);
     return prompt;
 }
 
@@ -45,10 +44,8 @@ gptController.styleLearning = async (req, res) => {
 
         const generatedReview = response.choices[0].message.content;
         res.status(200).json({ status: "success" , data: generatedReview});
-        console.log("생성된 리뷰:\n", generatedReview);
     } catch (error) {
         res.status(400).json({ status: "fail", error: error.message });
-        console.error("API 호출 중 오류 발생:", error.message);
     }
 };
 
@@ -71,10 +68,8 @@ gptController.styleChange = async (req, res) => {
         const generatedReview = response.choices[0].message.content;
 
         res.status(200).json({ status: "success" , data: generatedReview});
-        console.log("생성된 리뷰:\n", generatedReview);
     } catch (error) {
         res.status(400).json({ status: "fail", error: error.message });
-        console.error("API 호출 중 오류 발생:", error.message);
     }
 };
 
@@ -97,10 +92,8 @@ gptController.contentCorrection = async (req, res) => {
         const generatedReview = response.choices[0].message.content;
 
         res.status(200).json({ status: "success" , data: generatedReview});
-        console.log("생성된 리뷰:\n", generatedReview);
     } catch (error) {
         res.status(400).json({ status: "fail", error: error.message });
-        console.error("API 호출 중 오류 발생:", error.message);
     }
 };
 
@@ -124,10 +117,8 @@ gptController.spellingCorrection = async (req, res) => {
         const generatedReview = response.choices[0].message.content;
 
         res.status(200).json({ status: "success" , data: generatedReview});
-        console.log("생성된 리뷰:\n", generatedReview);
     } catch (error) {
         res.status(400).json({ status: "fail", error: error.message });
-        console.error("API 호출 중 오류 발생:", error.message);
     }
 };
 
