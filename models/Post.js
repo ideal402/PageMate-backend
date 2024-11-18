@@ -14,10 +14,12 @@ const postSchema = Schema(
   {
     userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
     text: { type: String, required: true },
-    img: { type: String },
+    title: { type: String, required: true},
+    // img: { type: String },
     likes: { type: [Schema.Types.ObjectId], ref: "User", default: [] },
     comments: { type: [commentSchema], default: [] },
     bookTitle: { type: String, required: true },
+    isDeleted: { type: Boolean, default: "false" }
   },
   { timestamps: true }
 );
