@@ -6,7 +6,7 @@ postController.createPost = async (req, res) => {
         const { text, title, bookTitle, bookAuthor } = req.body;
         const userId = req.userId;
 
-        if (!text || !title || !bookTitle || !bookAuthor) {
+        if (!text || !title || !bookTitle) {
             throw new Error("모든 필수 정보를 입력해 주세요.");
         }
 
