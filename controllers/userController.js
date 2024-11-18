@@ -22,4 +22,19 @@ userController.createUser = async (req, res) => {
   }
 };
 
+userController.getUser = async (req,res) => {
+  try {
+    const userId = req.userId
+    
+    const user = await User.findById(userId)
+    if(!user){
+      throw new Error("잘못된 토큰입니다.");
+    }
+
+    res.status(200).json({ status: "success", data: user });
+
+  } catch (error) {
+    res.status(400).json({ status: "fail", error: error.message });
+  }
+}
 module.exports = userController;
