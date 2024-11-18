@@ -23,8 +23,10 @@ function generateFewShotPrompt(samplesData, review) {
     return prompt;
 }
 
+// review_object : {author, title, review}
+// reviews : [{author, title, review}, {author, title, review}, ...]
 
-// 최신 OpenAI API 호출 (v4.x.x 방식)
+// 스타일 학습
 gptController.styleLearning = async (req, res) => {
     try {
         const {reviews,review_object} = req.body; 
@@ -49,6 +51,8 @@ gptController.styleLearning = async (req, res) => {
     }
 };
 
+// 문체 변환  
+// style : 화려체, 구어체, 문어체 등
 gptController.styleChange = async (req, res) => {
     try {
         const { style, review_object } = req.body;
@@ -73,12 +77,14 @@ gptController.styleChange = async (req, res) => {
     }
 };
 
+
+//내용 첨삭
 gptController.contentCorrection = async (req, res) => {
     try {
         const { review_object } = req.body;
         const { author, title, review } = review_object;
 
-        const prompt = `다음은 ${author}의 ${title} 책에 대한 리뷰 이고, 이 리뷰에 내용 첨삭을 해주세요. \n${review}`;   
+        const prompt = `다음은 ${author}의 ${title} 책에 대한 리뷰 이고, 이 리뷰의 스타일(반말여부, 구어체여부,자주 쓰이는 기교(변화법,강조법,비유법), 문체 등)을 유지하며 맞춤법을 교정하고 내용 첨삭을 해주세요. \n${review}`;   
         const response = await openai.chat.completions.create({
             model: "gpt-4o",
             messages: [
