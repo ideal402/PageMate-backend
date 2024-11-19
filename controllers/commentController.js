@@ -8,8 +8,8 @@ const commentController = {};
 commentController.addComment = async (req, res) => {
   try {
     const { postId, text } = req.body;
-    const userId = req.userId;
-    // const userId = "673b66ec320a8682a2ff7241"; 테스트 코드
+    // const userId = req.userId;
+    const userId = "673b66d9320a8682a2ff723e"; //테스트 코드
     // console.log("comment",text);
     // console.log("postId",postId);
 
@@ -80,16 +80,21 @@ commentController.fetchComments = async (req, res) => {
       });
     }
 
-    // 댓글 가져오기
-    const comments = await Comment.find({ _id: { $in: postExists.comments } })
-    .populate({ path: "userId", select: "name" })
+    // isDeleted가 false인 댓글만 가져오기
+    const comments = await Comment.find({ 
+      _id: { $in: postExists.comments }, 
+      isDeleted: false, 
+    })
+    .populate({ path: "userId", select: "name profilePhoto" })
     .exec();
 
     // name 값을 author로 매핑하여 데이터 가공
     const formattedComments = comments.map((comment) => ({
       _id: comment._id,
       postId: comment.postId,
+      userId: comment.userId._id,
       author: comment.userId.name, // userId.name을 author로 매핑
+      profilePhoto: comment.userId.profilePhoto,
       commentText: comment.commentText,
       commentDate: comment.commentDate,
       isDeleted: comment.isDeleted,
@@ -99,6 +104,47 @@ commentController.fetchComments = async (req, res) => {
     res.status(200).json({
       status: "success",
       data: formattedComments,
+    });
+  } catch (error) {
+    // 에러 처리
+    res.status(500).json({
+      status: "fail",
+      error: error.message,
+    });
+  }
+};
+
+// 댓글 삭제
+commentController.deleteComment = async (req, res) => {
+  try {
+    const { commentId } = req.params;
+
+    console.log("cid",commentId);
+    // 문자열을 ObjectId로 변환
+    if (!mongoose.Types.ObjectId.isValid(commentId)) {
+      return res.status(400).json({
+        status: "fail",
+        error: "Invalid commentId format",
+      });
+    }
+
+    // 댓글 찾기 및 isDeleted를 true로 설정
+    const comment = await Comment.findByIdAndUpdate(
+      commentId,
+      { isDeleted: true },
+      { new: true }
+    );
+
+    if (!comment) {
+      return res.status(404).json({
+        status: "fail",
+        error: "Comment not found.",
+      });
+    }
+
+    res.status(200).json({
+      status: "success",
+      message: "Comment successfully deleted",
     });
   } catch (error) {
     // 에러 처리
