@@ -75,4 +75,38 @@ postController.deletePost = async(req,res) => {
         res.status(400).json({status: 'fail', error: error.message});
     }
 }
+postController.likePost = async (req, res) => {
+    try {
+        const postId = req.params.id;
+        const userId = req.userId;
+
+        if (!userId) {
+            return res.status(401).json({ status: "fail", error: "로그인이 필요합니다." });
+        }
+        const post = await Post.findById(postId);
+        if (!post) {
+            return res.status(404).json({ status: "fail", error: "게시글을 찾을 수 없습니다." });
+        }
+        if (post.likes.includes(userId)) {
+            // 좋아요 취소: likes 배열에서 해당 userId를 제거
+            await Post.updateOne(
+                { _id: postId },
+                { $pull: { likes: userId } }  
+            );
+        } else {
+            // 좋아요 추가: likes 배열에 userId를 추가
+            await Post.updateOne(
+                { _id: postId },
+                { $push: { likes: userId } } 
+            );
+        }
+        // 게시글을 다시 조회하여 최신 상태로 반환
+        const updatedPost = await Post.findById(postId);
+        res.status(200).json({ status: "success", data: updatedPost });
+
+    } catch (error) {
+        res.status(400).json({ status: 'fail', error: error.message });
+    }
+};
+
 module.exports = postController;
