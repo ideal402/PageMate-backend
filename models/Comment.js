@@ -7,6 +7,7 @@ const commentSchema = new Schema(
     postId: { type: Schema.Types.ObjectId, ref: "Post", required: true },
     commentText: { type: String, required: true },
     commentDate: { type: Date, default: Date.now },
+    isDeleted: { type: Boolean, default: "false" },
   },
   { timestamps: true }
 );
