@@ -61,7 +61,7 @@ bookController.searchBooks = async (req, res) => {
 
 bookController.getBestSellers = async (req, res) => {
     const ALADIN_API_KEY = process.env.ALADIN_REST_API_KEY; // Kakao REST API Key 환경 변수에서 가져오기
-    const url = `http://www.aladin.co.kr/ttb/api/ItemList.aspx?MaxResults=10&start=1&SearchTarget=Book&output=js&Version=20131101&ttbkey=${ALADIN_API_KEY}&QueryType=Bestseller&Year=2024&Month=11&Week=1`
+    const url = `http://www.aladin.co.kr/ttb/api/ItemList.aspx?MaxResults=10&start=1&SearchTarget=Book&Cover=Big&output=js&Version=20131101&ttbkey=${ALADIN_API_KEY}&QueryType=Bestseller&Year=2024&Month=11&Week=1`
     console.log('url',url)
         try {
         const response = await axios.get(url);
