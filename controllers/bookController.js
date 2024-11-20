@@ -30,6 +30,13 @@ bookController.searchBooks = async (req, res) => {
             },
         });
 
+        // 결과 데이터에서 중복 제거
+        const uniqueResults = Array.from(
+            new Map(
+                response.data.documents.map((item) => [item.title + item.publisher, item]) // 중복을 title+publisher 기준으로 제거
+            ).values()
+        );
+        
         const results = response.data.documents.map((item) => ({
             title: item.title,
             authors: item.authors,
