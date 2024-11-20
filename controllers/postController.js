@@ -108,5 +108,40 @@ postController.likePost = async (req, res) => {
         res.status(400).json({ status: 'fail', error: error.message });
     }
 };
+postController.getMyPosts = async (req, res) => {
+    try {
+        const userId = req.userId;
+
+        if (!userId) {
+            return res.status(401).json({ status: "fail", error: "로그인이 필요합니다." });
+        }
+
+        // 사용자 ID로 사용자의 게시글 가져오기
+        const myPosts = await Post.find({ userId: userId, isDeleted: false }).sort({ createdAt: -1 });
+
+        res.status(200).json({ status: "success", data: myPosts });
+    } catch (error) {
+        console.error('Error fetching my posts:', error);
+        res.status(400).json({ status: 'fail', error: error.message });
+    }
+};
+
+postController.getLikedPosts = async (req, res) => {
+    try {
+        const userId = req.userId;
+
+        if (!userId) {
+            return res.status(401).json({ status: "fail", error: "로그인이 필요합니다." });
+        }
+
+        // 사용자가 좋아요를 누른 게시글 가져오기
+        const likedPosts = await Post.find({ likes: userId, isDeleted: false }).sort({ createdAt: -1 });
+
+        res.status(200).json({ status: "success", data: likedPosts });
+    } catch (error) {
+        console.error('Error fetching liked posts:', error);
+        res.status(400).json({ status: 'fail', error: error.message });
+    }
+};
 
 module.exports = postController;
