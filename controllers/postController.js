@@ -35,7 +35,13 @@ postController.getPosts = async(req,res) => {
         : {isDeleted: false};
         
         // 데이터베이스에서 조건에 맞는 게시글 검색
-        const posts = await Post.find(cond).sort({ createdAt: -1 }); // 최신순 정렬
+        const posts = await Post.find(cond)
+        .sort({ createdAt: -1 })
+        .populate({
+            path: 'comments', // comments 필드에 대해 populate 수행
+            match: { isDeleted: false }, // 댓글 중 isDeleted가 false인 것만 포함
+            select: '-__v', // 필요시 특정 필드 제외
+        }); // 최신순 정렬
 
         res.status(200).json({status: 'success', data: posts});
     } catch (error) {
