@@ -37,7 +37,7 @@ bookController.searchBooks = async (req, res) => {
             publisher: item.publisher,
         }));
 
-        res.json({
+        res.status(200).json({
             results,
             meta: {
                 totalCount: response.data.meta.total_count,
