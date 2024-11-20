@@ -11,7 +11,6 @@ postController.createPost = async (req, res) => {
         if (!text || !title || !bookTitle) {
             throw new Error("모든 필수 정보를 입력해 주세요.");
         }
-        const user = await User.findById(userId);
 
         const newPost = new Post({
             userId,
@@ -19,7 +18,7 @@ postController.createPost = async (req, res) => {
             title,
             bookTitle,
             bookAuthor,
-            author: user.name
+            author
         });
         
         await newPost.save();
