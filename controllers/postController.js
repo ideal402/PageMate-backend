@@ -18,7 +18,6 @@ postController.createPost = async (req, res) => {
             title,
             bookTitle,
             bookAuthor,
-            author
         });
         
         await newPost.save();
