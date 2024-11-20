@@ -19,7 +19,7 @@ postController.createPost = async (req, res) => {
             title,
             bookTitle,
             bookAuthor,
-            author: user.nickName
+            author: user.name
         });
         
         await newPost.save();
@@ -113,9 +113,9 @@ postController.getMyPosts = async (req, res) => {
     try {
         const userId = req.userId
 
-        const objectId = new mongoose.Types.ObjectId(userId)
+        // const objectId = new mongoose.Types.ObjectId(userId)
 
-        const posts = await Post.find({userId:objectId})
+        const posts = await Post.find({userId, isDeleted: false }).sort({ createdAt: -1 });
 
         res.status(200).json({status: 'success', data: posts});
     } catch (error) {
@@ -127,7 +127,7 @@ postController.getLikedPosts = async (req, res) => {
     try {
         const userId = req.userId
 
-        const likedPosts = await Post.find({likes:userId})
+        const likedPosts = await Post.find({likes:userId, isDeleted: false })
 
         res.status(200).json({status: 'success', data: likedPosts});
     } catch (error) {
