@@ -8,8 +8,8 @@ const commentController = {};
 commentController.addComment = async (req, res) => {
   try {
     const { postId, text } = req.body;
-    // const userId = req.userId;
-    const userId = "673b66d9320a8682a2ff723e"; //테스트 코드
+    const userId = req.userId;
+    // const userId = "673b66d9320a8682a2ff723e"; //테스트 코드
     // console.log("comment",text);
     // console.log("postId",postId);
 
