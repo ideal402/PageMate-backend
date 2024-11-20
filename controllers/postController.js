@@ -1,3 +1,4 @@
+const { default: mongoose } = require("mongoose");
 const Post = require("../models/Post");
 const postController = {};
 
@@ -6,7 +7,7 @@ postController.createPost = async (req, res) => {
         const { text, title, bookTitle, bookAuthor } = req.body;
         const userId = req.userId;
 
-        if (!text || !title || !bookTitle || !bookAuthor) {
+        if (!text || !title || !bookTitle) {
             throw new Error("모든 필수 정보를 입력해 주세요.");
         }
 
@@ -39,6 +40,32 @@ postController.getPosts = async(req,res) => {
         res.status(200).json({status: 'success', data: posts});
     } catch (error) {
         console.log('Error fetching posts:',error);
+        res.status(400).json({status: 'fail', error: error.message});
+    }
+}
+
+postController.getMyPosts = async (req, res) => {
+    try {
+        const userId = req.userId
+
+        const objectId = new mongoose.Types.ObjectId(userId)
+
+        const posts = await Post.find({userId:objectId})
+
+        res.status(200).json({status: 'success', data: posts});
+    } catch (error) {
+        res.status(400).json({status: 'fail', error: error.message});
+    }
+}
+
+postController.getLikedPosts = async (req, res) => {
+    try {
+        const userId = req.userId
+
+        const likedPosts = await Post.find({likes:userId})
+
+        res.status(200).json({status: 'success', data: likedPosts});
+    } catch (error) {
         res.status(400).json({status: 'fail', error: error.message});
     }
 }
