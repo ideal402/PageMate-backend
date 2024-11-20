@@ -4,7 +4,7 @@ const bcrypt = require("bcryptjs");
 
 userController.createUser = async (req, res) => {
   try {
-    let { email, password, nickName } = req.body;
+    let { email, password, name } = req.body;
     const user = await User.findOne({ email: email });
     if (user) {
       throw new Error("이미 가입된 이메일입니다.");
@@ -12,7 +12,7 @@ userController.createUser = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     newPassword = await bcrypt.hash(password, salt);
 
-    const newUser = new User({ email, password: newPassword, nickName });
+    const newUser = new User({ email, password: newPassword, name });
 
     await newUser.save();
 

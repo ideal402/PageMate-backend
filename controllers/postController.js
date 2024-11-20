@@ -1,3 +1,4 @@
+const { default: mongoose } = require("mongoose");
 const Post = require("../models/Post");
 const User = require("../models/User");
 const postController = {};
@@ -143,5 +144,31 @@ postController.getLikedPosts = async (req, res) => {
         res.status(400).json({ status: 'fail', error: error.message });
     }
 };
+
+postController.getMyPosts = async (req, res) => {
+    try {
+        const userId = req.userId
+
+        const objectId = new mongoose.Types.ObjectId(userId)
+
+        const posts = await Post.find({userId:objectId})
+
+        res.status(200).json({status: 'success', data: posts});
+    } catch (error) {
+        res.status(400).json({status: 'fail', error: error.message});
+    }
+}
+
+postController.getLikedPosts = async (req, res) => {
+    try {
+        const userId = req.userId
+
+        const likedPosts = await Post.find({likes:userId})
+
+        res.status(200).json({status: 'success', data: likedPosts});
+    } catch (error) {
+        res.status(400).json({status: 'fail', error: error.message});
+    }
+}
 
 module.exports = postController;
