@@ -8,11 +8,8 @@ const commentController = {};
 commentController.addComment = async (req, res) => {
   try {
     const { postId, text } = req.body;
-    // const userId = req.userId;
-    const userId = "673b66d9320a8682a2ff723e"; //테스트 코드
-    // console.log("comment",text);
-    // console.log("postId",postId);
-
+    const userId = req.userId;
+  
     // 필수 필드 확인
     if (!postId || !text) {
       return res.status(400).json({
@@ -119,7 +116,6 @@ commentController.deleteComment = async (req, res) => {
   try {
     const { commentId } = req.params;
 
-    console.log("cid",commentId);
     // 문자열을 ObjectId로 변환
     if (!mongoose.Types.ObjectId.isValid(commentId)) {
       return res.status(400).json({
