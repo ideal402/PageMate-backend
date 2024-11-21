@@ -37,4 +37,37 @@ userController.getUser = async (req,res) => {
     res.status(400).json({ status: "fail", error: error.message });
   }
 }
+
+userController.uploadProfilePhoto = async (req, res) => {
+  try {
+    const userId = req.userId; // 인증 미들웨어에서 설정된 사용자 ID
+    const { profilePhoto } = req.body; // 요청에서 새로운 프로필 사진 URL 받기
+
+    if (!profilePhoto) {
+      throw new Error("프로필 사진 URL이 제공되지 않았습니다.");
+    }
+
+    // 사용자 업데이트
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { profilePhoto },
+      { new: true } // 업데이트된 사용자 데이터를 반환
+    );
+
+    if (!updatedUser) {
+      throw new Error("사용자를 찾을 수 없습니다.");
+    }
+
+    res.status(200).json({
+      status: "success",
+      data: updatedUser,
+    });
+  } catch (error) {
+    res.status(400).json({
+      status: "fail",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = userController;
