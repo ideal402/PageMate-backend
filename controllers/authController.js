@@ -59,6 +59,32 @@ authController.loginWithGoogle = async (req, res) => {
   }
 };
 
+
+authController.loginWithKakao = async (req, res) => {
+  try {
+    const { token } = req.body;
+    console.log("🚀 ~ authController.loginWithGoogle= ~ req.body:", req.body)
+
+    // const { email, name } = ticket.getPayload();
+
+    // let user = await User.findOne({ email: email });
+    // if (user === null) {
+    //   const randomPassword = generateRandomPassword(10);
+    //   const salt = await bcrypt.genSalt(10);
+    //   const newPassword = await bcrypt.hash(randomPassword, salt);
+    //   user = new User({ email: email, password: newPassword, name: name });
+    //   await user.save();
+    // }
+
+    // const sessionToken = await user.generateToken();
+
+    res.status(200).json({ status: "success" });
+
+  } catch (error) {
+    res.status(400).json({ status: "fail", error: error.message });
+  }
+};
+
 authController.authenticate = async (req, res, next) => {
   try {
     const tokenString = req.headers.authorization;

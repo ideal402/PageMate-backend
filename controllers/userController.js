@@ -59,8 +59,6 @@ userController.updateUserName = async (req,res) => {
   try {
     const userId = req.userId
     const {updateName} = req.body
-    console.log("🚀 ~ userController.updateUserName= ~ req.body:", req.body)
-    console.log("🚀 ~ userController.updateUserName= ~ updateName:", updateName)
     
     const user = await User.findByIdAndUpdate(
       userId,
@@ -82,12 +80,16 @@ userController.updateUserName = async (req,res) => {
 userController.uploadProfilePhoto = async (req, res) => {
   try {
     const userId = req.userId; // 인증 미들웨어에서 설정된 사용자 ID
-    const { profilePhoto } = req.body; // 요청에서 새로운 프로필 사진 URL 받기
+    let { profilePhoto } = req.body; // 요청에서 새로운 프로필 사진 URL 받기
+    console.log("🚀 ~ userController.uploadProfilePhoto= ~ profilePhoto:", profilePhoto)
 
     if (!profilePhoto) {
       throw new Error("프로필 사진 URL이 제공되지 않았습니다.");
     }
-
+    if (profilePhoto === "delete") {
+      profilePhoto = ""
+    }
+    
     // 사용자 업데이트
     const updatedUser = await User.findByIdAndUpdate(
       userId,
