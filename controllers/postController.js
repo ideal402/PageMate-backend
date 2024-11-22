@@ -22,7 +22,7 @@ postController.createPost = async (req, res) => {
 
         const populatedPost = await Post.findById(newPost._id).populate({
             path: "userId",
-            select: "nickName profilePhoto", 
+            select: "name profilePhoto", 
         });
         
         res.status(200).json({ status: "success", data: populatedPost});
@@ -48,7 +48,7 @@ postController.getPosts = async (req, res) => {
             .limit(limitNumber) // 한 페이지에 보여줄 개수
             .populate({
                 path: 'userId', 
-                select: 'nickName profilePhoto', 
+                select: 'name profilePhoto', 
             })
             .populate({
                 path: 'comments', // comments 필드에 대해 populate 수행
@@ -65,7 +65,7 @@ postController.getPosts = async (req, res) => {
                 title: post.title,
                 text: post.text,
                 date: post.createdAt, // 작성 시간
-                name: post.userId?.nickName, 
+                name: post.userId?.name, 
                 profilePhoto: post.userId?.profilePhoto, 
                 likes: post.likes,
                 comments: post.comments,
@@ -153,7 +153,7 @@ postController.likePost = async (req, res) => {
         const updatedPost = await Post.findById(postId)
             .populate({
                 path: "userId",
-                select: "nickName profilePhoto",
+                select: "name profilePhoto",
             })
             .select("-__v"); // 필요없는 필드 제거
 
@@ -180,7 +180,7 @@ postController.getMyPosts = async (req, res) => {
             .sort({ createdAt: -1 })
             .populate({
                 path: "userId",
-                select: "nickName profilePhoto", 
+                select: "name profilePhoto", 
             });
 
         res.status(200).json({status: 'success', data: posts});
