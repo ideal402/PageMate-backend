@@ -160,7 +160,12 @@ postController.getMyPosts = async (req, res) => {
 
         // const objectId = new mongoose.Types.ObjectId(userId)
 
-        const posts = await Post.find({userId, isDeleted: false }).sort({ createdAt: -1 });
+        const posts = await Post.find({ userId, isDeleted: false })
+            .sort({ createdAt: -1 })
+            .populate({
+                path: "userId",
+                select: "nickName profilePhoto", 
+            });
 
         res.status(200).json({status: 'success', data: posts});
     } catch (error) {
