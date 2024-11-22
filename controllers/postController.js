@@ -7,11 +7,10 @@ postController.createPost = async (req, res) => {
     try {
         const { text, title, bookTitle, bookAuthor } = req.body;
         const userId = req.userId;
-
+        const user = await User.findById(userId);
         if (!text || !title || !bookTitle) {
             throw new Error("모든 필수 정보를 입력해 주세요.");
         }
-
         const newPost = new Post({
             userId,
             text,
@@ -19,10 +18,14 @@ postController.createPost = async (req, res) => {
             bookTitle,
             bookAuthor,
         });
-        
         await newPost.save();
 
-        res.status(200).json({ status: "success", data: newPost });
+        const populatedPost = await Post.findById(newPost._id).populate({
+            path: "userId",
+            select: "nickName profilePhoto", 
+        });
+        
+        res.status(200).json({ status: "success", data: populatedPost });
     } catch (error) {
         res.status(400).json({ status: "fail", error: error.message });
     }
@@ -31,7 +34,6 @@ postController.getPosts = async (req, res) => {
     try {
         const { bookTitle, page = 1, limit = 10 } = req.query;
 
-        // 페이지와 제한값을 정수로 변환
         const pageNumber = parseInt(page);
         const limitNumber = parseInt(limit);
 
@@ -45,17 +47,38 @@ postController.getPosts = async (req, res) => {
             .skip((pageNumber - 1) * limitNumber) // 페이지 시작 위치
             .limit(limitNumber) // 한 페이지에 보여줄 개수
             .populate({
+                path: 'userId', 
+                select: 'nickName profilePhoto', 
+            })
+            .populate({
                 path: 'comments', // comments 필드에 대해 populate 수행
                 match: { isDeleted: false }, // 댓글 중 isDeleted가 false인 것만 포함
                 select: '-__v', // 필요시 특정 필드 제외
             });
+            console.log(posts)
+            const formattedPosts = posts.map(post => ({
+                _id: post._id,
+                id: post._id,
+                userId: post.userId, // 작성자 ID
+                bookTitle: post.bookTitle,
+                bookAuthor: post.bookAuthor,
+                title: post.title,
+                text: post.text,
+                date: post.createdAt, // 작성 시간
+                name: post.userId?.nickName, 
+                profilePhoto: post.userId?.profilePhoto, 
+                likes: post.likes,
+                comments: post.comments,
+                likeCount: post.likes.length,
+                liked: false, // 이 필드는 프론트엔드에서 처리
+            }));
 
         const totalPosts = await Post.countDocuments(cond); // 조건에 맞는 전체 게시글 수
         const hasMore = pageNumber * limitNumber < totalPosts; // 다음 데이터가 있는지 확인
 
         res.status(200).json({
             status: 'success',
-            data: posts,
+            data: formattedPosts,
             pagination: {
                 totalPosts,
                 currentPage: pageNumber,
@@ -71,9 +94,7 @@ postController.getPosts = async (req, res) => {
 
 postController.updatePost = async(req,res) => {
     try {
-        console.log("req.params:", req);
         const postId = req.params.id;
-        console.log("postId:", postId);
         const userId = req.userId;
         const update = req.body;
         const post = await Post.findById(postId);
