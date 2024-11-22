@@ -55,6 +55,30 @@ userController.deleteUser = async (req,res) => {
   }
 }
 
+userController.updateUserName = async (req,res) => {
+  try {
+    const userId = req.userId
+    const {updateName} = req.body
+    console.log("🚀 ~ userController.updateUserName= ~ req.body:", req.body)
+    console.log("🚀 ~ userController.updateUserName= ~ updateName:", updateName)
+    
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { name: updateName },
+      { new: true } // 업데이트된 문서를 반환
+    );
+
+    if (!user) {
+      return res.status(400).json({ status: "fail", error: "User Not found" });
+    }
+    
+    res.status(200).json({ status: "success", data: user });
+
+  } catch (error) {
+    res.status(400).json({ status: "fail", error: error.message });
+  }
+}
+
 userController.uploadProfilePhoto = async (req, res) => {
   try {
     const userId = req.userId; // 인증 미들웨어에서 설정된 사용자 ID
