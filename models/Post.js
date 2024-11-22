@@ -14,7 +14,6 @@ const postSchema = Schema(
     },
     bookTitle: { type: String, required: true},
     bookAuthor: { type: String, required: true},
-    author: {type: String},
     isDeleted: { type: Boolean, default: "false" }
   },
   { timestamps: true }
