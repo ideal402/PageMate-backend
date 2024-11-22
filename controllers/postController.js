@@ -25,7 +25,7 @@ postController.createPost = async (req, res) => {
             select: "nickName profilePhoto", 
         });
         
-        res.status(200).json({ status: "success", data: populatedPost });
+        res.status(200).json({ status: "success", data: populatedPost});
     } catch (error) {
         res.status(400).json({ status: "fail", error: error.message });
     }
