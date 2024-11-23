@@ -5,5 +5,8 @@ const authController = require("../controllers/authController");
 
 router.post("/", userController.createUser);
 router.get("/me", authController.authenticate, userController.getUser);
+router.put("/profile", authController.authenticate, userController.uploadProfilePhoto);
+router.delete("/", authController.authenticate, userController.deleteUser);
+router.put("/name", authController.authenticate, userController.updateUserName);
 
 module.exports = router;

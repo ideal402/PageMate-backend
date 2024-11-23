@@ -58,7 +58,7 @@ gptController.styleChange = async (req, res) => {
         const { style, review_object } = req.body;
         const { author, title, review } = review_object;
 
-        const prompt = `글의 문체를 ${style}로 바꿔주시고 추가적인 문장을 생성하지 마시오.\n${review}`;   
+        const prompt = `글의 문체를 ${style}로 바꿔주시고 추가적인 문장을 생성하지 마시오, 내 말에 대답은 하지말고 오직 문체만 바꿔주세요. \n${review}`;   
         const response = await openai.chat.completions.create({
             model: "gpt-4o",
             messages: [
@@ -84,7 +84,7 @@ gptController.contentCorrection = async (req, res) => {
         const { review_object } = req.body;
         const { author, title, review } = review_object;
 
-        const prompt = `다음은 ${author}의 ${title} 책에 대한 리뷰 이고, 이 리뷰의 스타일(반말여부, 구어체여부,자주 쓰이는 기교(변화법,강조법,비유법), 문체 등)을 유지하며 맞춤법을 교정하고 내용 첨삭을 해주세요. \n${review}`;   
+        const prompt = `다음은 ${author}의 ${title} 책에 대한 리뷰 이고, 이 리뷰의 스타일(반말여부, 구어체여부,자주 쓰이는 기교(변화법,강조법,비유법), 문체 등)을 유지하며 맞춤법을 교정하고 이상한 내용은 빼주고 보완할 내용을 더해주세요, 내 말에 대답은 하지말고 오직 첨삭된 리뷰만 작성해주시오. \n${review}`;   
         const response = await openai.chat.completions.create({
             model: "gpt-4o",
             messages: [
@@ -109,7 +109,7 @@ gptController.spellingCorrection = async (req, res) => {
         const { review_object } = req.body;
         const { author, title, review } = review_object;
 
-        const prompt = `다음은 ${author}의 ${title} 책에 대한 리뷰 이고, 이 리뷰에 문장을 추가하지 말고 맞춤법만을 교정해주세요. \n${review}`;   
+        const prompt = `다음은 ${author}의 ${title} 책에 대한 리뷰 이고, 이 리뷰에 문장을 추가하지 말고 맞춤법만을 교정해주세요, 내 말에 대답은 하지말고 교정하여 맞춤법 교정된 리뷰만 출력해주세요. \n${review} `;   
         const response = await openai.chat.completions.create({
             model: "gpt-4o",
             messages: [
@@ -127,5 +127,28 @@ gptController.spellingCorrection = async (req, res) => {
         res.status(400).json({ status: "fail", error: error.message });
     }
 };
+
+gptController.aiRequest = async (req, res) => {
+    try{
+        const { review_object,aiRequestText } = req.body;
+        
+        const { author, title, review } = review_object;
+        const prompt = `다음은 ${author}의 ${title} 책에 대한 리뷰 중 일부야. \n${review} \n 위의 리뷰를 토대로, ${aiRequestText}, 내 말에 대답은 하지말고 오직 방금 요청으로 생성된 리뷰만 작성해주세요.`;   
+        const response = await openai.chat.completions.create({
+            model: "gpt-4o",
+            messages: [
+                { role: "system", content: "You are a helpful assistant." },
+                { role: "user", content: prompt }
+            ],
+            max_tokens: 1000,
+            temperature: 0.7
+        });
+
+        const generatedReview = response.choices[0].message.content;
+        res.status(200).json({ status: "success" , data: generatedReview});
+    } catch (error) {
+        res.status(400).json({ status: "fail", error: error.message });
+    }
+}
 
 module.exports = gptController;
