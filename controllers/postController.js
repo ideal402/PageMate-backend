@@ -22,7 +22,7 @@ postController.createPost = async (req, res) => {
 
         const populatedPost = await Post.findById(newPost._id).populate({
             path: "userId",
-            select: "nickName profilePhoto", 
+            select: "name profilePhoto", 
         });
         
         res.status(200).json({ status: "success", data: populatedPost});
@@ -53,7 +53,7 @@ postController.getPosts = async (req, res) => {
             .limit(limitNumber) // 한 페이지에 보여줄 개수
             .populate({
                 path: 'userId', 
-                select: 'nickName profilePhoto', 
+                select: 'name profilePhoto', 
             })
             .populate({
                 path: 'comments', // comments 필드에 대해 populate 수행
@@ -70,7 +70,7 @@ postController.getPosts = async (req, res) => {
                 title: post.title,
                 text: post.text,
                 date: post.createdAt, // 작성 시간
-                name: post.userId?.nickName, 
+                name: post.userId?.name, 
                 profilePhoto: post.userId?.profilePhoto, 
                 likes: post.likes,
                 comments: post.comments,
@@ -138,22 +138,38 @@ postController.likePost = async (req, res) => {
         if (!post) {
             return res.status(404).json({ status: "fail", error: "게시글을 찾을 수 없습니다." });
         }
+        let liked;
         if (post.likes.includes(userId)) {
             // 좋아요 취소: likes 배열에서 해당 userId를 제거
             await Post.updateOne(
                 { _id: postId },
                 { $pull: { likes: userId } }  
             );
+            liked = false;
         } else {
             // 좋아요 추가: likes 배열에 userId를 추가
             await Post.updateOne(
                 { _id: postId },
                 { $push: { likes: userId } } 
             );
+            liked = true;
         }
         // 게시글을 다시 조회하여 최신 상태로 반환
-        const updatedPost = await Post.findById(postId);
-        res.status(200).json({ status: "success", data: updatedPost });
+        const updatedPost = await Post.findById(postId)
+            .populate({
+                path: "userId",
+                select: "name profilePhoto",
+            })
+            .select("-__v"); // 필요없는 필드 제거
+
+        res.status(200).json({
+            status: "success",
+            data: {
+                ...updatedPost.toObject(),
+                liked,
+                likeCount: updatedPost.likes.length,
+            },
+        });
 
     } catch (error) {
         res.status(400).json({ status: 'fail', error: error.message });
@@ -165,7 +181,12 @@ postController.getMyPosts = async (req, res) => {
 
         // const objectId = new mongoose.Types.ObjectId(userId)
 
-        const posts = await Post.find({userId, isDeleted: false }).sort({ createdAt: -1 });
+        const posts = await Post.find({ userId, isDeleted: false })
+            .sort({ createdAt: -1 })
+            .populate({
+                path: "userId",
+                select: "name profilePhoto", 
+            });
 
         res.status(200).json({status: 'success', data: posts});
     } catch (error) {
