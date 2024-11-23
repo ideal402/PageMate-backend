@@ -85,8 +85,11 @@ commentController.fetchComments = async (req, res) => {
     .populate({ path: "userId", select: "name profilePhoto" })
     .exec();
 
+    // userId가 null인 댓글 제거
+    const validComments = comments.filter(comment => comment.userId !== null);
+
     // name 값을 author로 매핑하여 데이터 가공
-    const formattedComments = comments.map((comment) => ({
+    const formattedComments = validComments.map((comment) => ({
       _id: comment._id,
       postId: comment.postId,
       userId: comment.userId._id,
