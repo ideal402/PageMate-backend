@@ -80,22 +80,22 @@ authController.loginWithKakao = async (req, res) => {
     });
     const kakaoUser = response2.data;
     
-    console.log("🚀 ~ authController.loginWithKakao= ~ kakaoUser:", kakaoUser);
+    const id = kakaoUser.id
+    const email = id+"@kakao.com"
+    const { nickname,thumbnail_image } = kakaoUser.properties;
 
-    // const { email, name } = ticket.getPayload();
+    let user = await User.findOne({ email: email });
+    if (user === null) {
+      const randomPassword = generateRandomPassword(10);
+      const salt = await bcrypt.genSalt(10);
+      const newPassword = await bcrypt.hash(randomPassword, salt);
+      user = new User({ email: email, password: newPassword, name: nickname, profilePhoto:thumbnail_image });
+      await user.save();
+    }
 
-    // let user = await User.findOne({ email: email });
-    // if (user === null) {
-    //   const randomPassword = generateRandomPassword(10);
-    //   const salt = await bcrypt.genSalt(10);
-    //   const newPassword = await bcrypt.hash(randomPassword, salt);
-    //   user = new User({ email: email, password: newPassword, name: name });
-    //   await user.save();
-    // }
+    const sessionToken = await user.generateToken();
 
-    // const sessionToken = await user.generateToken();
-
-    res.status(200).json({ status: "success" });
+    res.status(200).json({ status: "success", user, sessionToken });
   } catch (error) {
     console.error("Kakao Token Request Error:", error.response?.data || error.message);
     res.status(400).json({ status: "fail", error: error.message });
