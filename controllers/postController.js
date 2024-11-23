@@ -189,9 +189,39 @@ postController.getMyPosts = async (req, res) => {
             .populate({
                 path: "userId",
                 select: "name profilePhoto", 
+            })
+            .populate({
+                path: 'comments', // comments 필드에 대해 populate 수행
+                match: { isDeleted: false }, // 댓글 중 isDeleted가 false인 것만 포함
+                populate: { // 댓글 작성자를 가져오기(탈퇴한 유저 제외하기 위함)
+                    path: 'userId',
+                    select: 'name',
+                },
             });
 
-        res.status(200).json({status: 'success', data: posts});
+            const formattedPosts = posts.map(post => {
+                const filteredComments = post.comments.filter(comment => comment.userId !== null);
+    
+                return {
+                    _id: post._id,
+                    id: post._id,
+                    userId: post.userId, // 작성자 정보
+                    bookTitle: post.bookTitle,
+                    bookAuthor: post.bookAuthor,
+                    title: post.title,
+                    text: post.text,
+                    date: post.createdAt, // 작성 시간
+                    name: post.userId?.name,
+                    profilePhoto: post.userId?.profilePhoto,
+                    likes: post.likes,
+                    comments: filteredComments, // 필터링된 댓글
+                    commentCount: filteredComments.length, // 댓글 수
+                    likeCount: post.likes.length,
+                    liked: false, // 프론트엔드에서 처리할 필드
+                };
+            });
+
+        res.status(200).json({status: 'success', data: formattedPosts});
     } catch (error) {
         res.status(400).json({status: 'fail', error: error.message});
     }
@@ -202,8 +232,37 @@ postController.getLikedPosts = async (req, res) => {
         const userId = req.userId
 
         const likedPosts = await Post.find({likes:userId, isDeleted: false })
+            .populate({
+                path: 'comments', // comments 필드에 대해 populate 수행
+                match: { isDeleted: false }, // 댓글 중 isDeleted가 false인 것만 포함
+                populate: { // 댓글 작성자를 가져오기(탈퇴한 유저 제외하기 위함)
+                    path: 'userId',
+                    select: 'name',
+                },
+            });
+        
+        const formattedPosts = likedPosts.map(post => {
+            const filteredComments = post.comments.filter(comment => comment.userId !== null);
 
-        res.status(200).json({status: 'success', data: likedPosts});
+            return {
+                _id: post._id,
+                id: post._id,
+                userId: post.userId, // 작성자 정보
+                bookTitle: post.bookTitle,
+                bookAuthor: post.bookAuthor,
+                title: post.title,
+                text: post.text,
+                date: post.createdAt, // 작성 시간
+                name: post.userId?.name,
+                profilePhoto: post.userId?.profilePhoto,
+                likes: post.likes,
+                comments: filteredComments, // 필터링된 댓글
+                commentCount: filteredComments.length, // 댓글 수
+                likeCount: post.likes.length,
+                liked: false, // 프론트엔드에서 처리할 필드
+            };
+        });
+        res.status(200).json({status: 'success', data: formattedPosts});
     } catch (error) {
         res.status(400).json({status: 'fail', error: error.message});
     }
