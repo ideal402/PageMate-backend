@@ -109,7 +109,7 @@ gptController.spellingCorrection = async (req, res) => {
         const { review_object } = req.body;
         const { author, title, review } = review_object;
 
-        const prompt = `다음은 ${author}의 ${title} 책에 대한 리뷰 이고, 이 리뷰에 문장을 추가하지 말고 맞춤법만을 교정해주세요, 내 말에 대답은 하지말고 교정하여 맞춤법 교정된 리뷰만 출력해주세요. \n${review} `;   
+        const prompt = `다음 리뷰에 문장을 추가하지 말고 맞춤법만을 교정하여 출력해주세요. \n${review} `;   
         const response = await openai.chat.completions.create({
             model: "gpt-4o",
             messages: [
