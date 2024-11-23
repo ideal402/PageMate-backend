@@ -36,9 +36,14 @@ postController.getPosts = async (req, res) => {
 
         const pageNumber = parseInt(page);
         const limitNumber = parseInt(limit);
+        let book_regex = "";
 
+        if (bookTitle) {
+            book_regex = new RegExp(bookTitle.split("").join(".*"), "i");
+        }
+        
         const cond = bookTitle
-            ? { bookTitle: { $regex: bookTitle, $options: 'i' }, isDeleted: false }
+            ? { bookTitle: { $regex: book_regex }, isDeleted: false }
             : { isDeleted: false };
 
         // 데이터베이스에서 조건에 맞는 게시글 검색
@@ -75,7 +80,7 @@ postController.getPosts = async (req, res) => {
 
         const totalPosts = await Post.countDocuments(cond); // 조건에 맞는 전체 게시글 수
         const hasMore = pageNumber * limitNumber < totalPosts; // 다음 데이터가 있는지 확인
-
+        console.log("#########################")
         res.status(200).json({
             status: 'success',
             data: formattedPosts,
