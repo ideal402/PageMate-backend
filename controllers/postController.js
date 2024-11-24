@@ -88,7 +88,7 @@ postController.getPosts = async (req, res) => {
 
         const totalPosts = await Post.countDocuments(cond); // 조건에 맞는 전체 게시글 수
         const hasMore = pageNumber * limitNumber < totalPosts; // 다음 데이터가 있는지 확인
-        console.log("#########################")
+       
         res.status(200).json({
             status: 'success',
             data: formattedPosts,
@@ -237,6 +237,11 @@ postController.getLikedPosts = async (req, res) => {
         const userId = req.userId
 
         const likedPosts = await Post.find({likes:userId, isDeleted: false })
+            .sort({ createdAt: -1 })
+            .populate({
+                path: "userId",
+                select: "name profilePhoto", 
+            })
             .populate({
                 path: 'comments', // comments 필드에 대해 populate 수행
                 match: { isDeleted: false }, // 댓글 중 isDeleted가 false인 것만 포함
@@ -248,7 +253,7 @@ postController.getLikedPosts = async (req, res) => {
         
         const formattedPosts = likedPosts.map(post => {
             const filteredComments = post.comments.filter(comment => comment.userId !== null);
-
+           
             return {
                 _id: post._id,
                 id: post._id,
